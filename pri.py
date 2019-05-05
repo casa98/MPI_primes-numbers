@@ -16,8 +16,7 @@ def prime(num):
     for i in range(2, num//2+1):
         if (num % i) == 0: 
             break
-    else: 
-        print(num, "is a prime number") 
+    else:
         return True
     return False
 
@@ -73,11 +72,18 @@ else:
             total = total + 1
         times = times + 1
 
+
+
+total_primos = comm.reduce(total, op=MPI.SUM, root=0)
+
+
 if rank == 0:
-    print(time.time()-start)
+    print(round(time.time()-start, 5), "seconds")
+    print("Total number of primes: ", total_primos)
 else:
     print("Process", rank, "executed",times, "times")
-    print("Total prime numbers: ", total)
+
+    
 
 
 
