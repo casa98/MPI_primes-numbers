@@ -8,6 +8,8 @@ rank = comm.Get_rank()
 
 n = int(sys.argv[1])
 aux = 2
+times = 0
+total = 0
 
 
 def prime(num):
@@ -16,6 +18,8 @@ def prime(num):
             break
     else: 
         print(num, "is a prime number") 
+        return True
+    return False
 
 start = 0
 if rank == 0:
@@ -29,7 +33,9 @@ else:
     data = comm.recv(source = 0) 
     val = [rank, data]
     if val[1] <= n:
-        prime(val[1])
+        if(prime(val[1])):
+            total = total + 1
+        times = times + 1
     comm.send(rank, dest = 0)   # Give something back to root (the rank in this case)
     # Hasta acá, cada process tiene un valor inicial para empezar a trabajar
 
@@ -47,7 +53,9 @@ while aux < n:
         data = comm.recv(source = 0)
         val = [rank, data]
         if val[1] <= n:
-            prime(val[1])
+            if(prime(val[1])):
+                total = total + 1
+            times = times + 1
         comm.send(rank, dest = 0)
     aux = comm.bcast(aux, root=0) 
 
@@ -61,10 +69,15 @@ else:
     data = comm.recv(source = 0) 
     val = [rank, data]
     if val[1] <= n:
-        prime(val[1])
+        if(prime(val[1])):
+            total = total + 1
+        times = times + 1
 
-#aux = comm.bcast(aux, root=0) 
 if rank == 0:
     print(time.time()-start)
+else:
+    print("Process", rank, "executed",times, "times")
+    print("Total prime numbers: ", total)
+
 
 
